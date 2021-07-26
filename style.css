@@ -5,6 +5,18 @@ body {
     grid-template-columns: [first] 1fr [middle] auto [last] 1fr;
     height: 100vh;
     place-items: center;
+    font-size: 18px;
+    font-family: Roboto, sans-serif;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.space-evenly {
+    justify-content: space-evenly;
 }
 
 #matchfield {
@@ -16,9 +28,46 @@ body {
     position: relative;
 }
 
-#renderTime {
+#renderTime, #tickCounter {
     padding: 10px;
     color: #fff;
+    white-space: nowrap;
+}
+
+#form {
+    padding: 0 30px;
+}
+
+label {
+    color: #fff;
+    min-width: 150px;
+    line-height: 30px;
+}
+
+input {
+    font-size: 20px;
+    max-width: 150px;
+}
+
+button {
+    font-size: 18px;
+    border: none;
+    padding: 4px 15px;
+    transition: background 400ms;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+#generate {
+    background: lightblue;
+}
+
+.start {
+    background: lightgreen;
+}
+
+.stop {
+    background: lightcoral;
 }
 
 .person {
@@ -26,14 +75,28 @@ body {
     background: lightgreen;
     width: 10px;
     height: 10px;
+    z-index: 10;
 }
 
 .round {
     border-radius: 50%;
 }
 
-.ill {
+.infected {
+    background: red;
+}
+
+.incubating {
     background: lightcoral;
+}
+
+.dead {
+    background: #333;
+    z-index: 1;
+}
+
+.cured {
+    background: lightskyblue;
 }
 
 .column-last {
@@ -46,4 +109,8 @@ body {
     grid-column: first;
     place-self: start;
     width: 100%;
+}
+
+.first-baseline {
+    place-self: first baseline;
 }

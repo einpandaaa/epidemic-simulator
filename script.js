@@ -5,30 +5,65 @@ const radius = 5;
 const drawTime = new LinkedList();
 
 /** Default Values */
-let population = 100;
-let patientZeros = 1;
-let incubationTime = 14;
-let infectedTime = 14;
-let lethality = 3;
+let population = document.getElementById("population").value;
+let patientZeros = document.getElementById("patient").value;
+let incubationTime = document.getElementById("incubation").value * 30;
+let infectedTime = document.getElementById("infected").value * 30;
+let lethality = document.getElementById("lethality").value;
 
 let running = false;
+let ticks = 0;
 let persons = [];
+
+let stats = {};
 
 document.getElementById("start-stop").addEventListener('click', startStop);
 document.getElementById("generate").addEventListener('click', startGeneration);
+document.getElementById("form").addEventListener('input', detectUserInput);
 
 function tick() {
     if(running) {
+        document.getElementById("tickCounter").innerText = ((++ticks)/30 | 0) + " days";
         movePersons();
         requestAnimationFrame(tick);
+    }
+}
+
+function detectUserInput(event) {
+    switch(event.target.id) {
+        case "population":
+            population = event.target.value;
+            break;
+        case "patient":
+            patientZeros = event.target.value;
+            break;
+        case "incubation":
+            incubationTime = event.target.value * 30;
+            break;
+        case "infected":
+            infectedTime = event.target.value * 30;
+            break;
+        case "lethality":
+            lethality = event.target.value;
+            break;
     }
 }
 
 function startStop() {
     if(persons.length) {
         running = !running;
+
         if(running) {
+            document.querySelectorAll("#form input").forEach((e) => {
+                e.setAttribute("disabled", "disabled");
+            });
+            document.getElementById("start-stop").className = "stop";
             requestAnimationFrame(tick);
+        } else {
+            document.getElementById("start-stop").className = "start";
+            document.querySelectorAll("#form input").forEach((e) => {
+                e.removeAttribute("disabled");
+            });
         }
     } else {
         alert("Not Generated!");
@@ -37,7 +72,16 @@ function startStop() {
 
 function startGeneration() {
     running = false;
-    patientZeros = 1;
+    ticks = 0;
+    document.getElementById("tickCounter").innerText = "0 days";
+
+    if(patientZeros === 0) {
+        patientZeros = document.getElementById("patient").value;
+    }
+
+    stats.incubated = 0;
+    stats.infected = 0;
+
     if(persons.length) {
         matchfield.innerHTML = '';
         persons = [];
@@ -70,7 +114,7 @@ function generatePerson(coords) {
     calculateMoveParams(person);
 
     if(patientZeros > 0) {
-        infectPerson(person);
+        incubatePerson(person);
         patientZeros--;
     }
 
@@ -95,9 +139,56 @@ function generateKoords() {
  */
 function infectPerson(person) {
     if(!person.infected) {
-        person.node.classList.add("ill");
+        person.node.classList.add("infected");
+        person.node.classList.remove("incubating");
         person.infected = true;
+        person.infectedTime = 1;
+
+        if(Math.random() * 100 <= lethality) {
+            person.willDie = true;
+        }
+
+        stats.incubated--;
+        stats.infected++;
     }
+}
+
+/**
+ * @param {Person} person
+ */
+function incubatePerson(person) {
+    if(!person.incubationTime && !person.isCured) {
+        person.incubationTime = 1;
+        person.node.classList.add("incubating");
+
+        stats.incubated++;
+    }
+}
+
+/**
+ * @param {Person} person
+ */
+function killPerson(person) {
+    person.node.classList.remove("infected");
+    person.node.classList.add("dead");
+    persons.splice(persons.indexOf(person),1);
+
+    stats.infected--;
+    isEnd();
+}
+
+/**
+ * @param {Person} person
+ */
+function curePerson(person) {
+    person.node.classList.remove("infected");
+    person.node.classList.add("cured")
+    person.isCured = true;
+    person.infected = false;
+    person.incubationTime = 0;
+
+    stats.infected--;
+    isEnd();
 }
 
 /**
@@ -119,14 +210,31 @@ function movePersons() {
     persons.forEach((p) => {
         p.x += p.velocityX;
         p.y += p.velocityY;
-
         setPersonCoords(p);
 
-        detectCollision(p);
+        if(p.incubationTime) {
+            if(p.incubationTime == incubationTime) {
+                infectPerson(p);
+            } else if(p.incubationTime < incubationTime ) {
+                p.incubationTime++;
+            }
+        }
+        if(p.infected) {
+            if(p.infectedTime == infectedTime) {
+                if(p.willDie) {
+                    killPerson(p);
+                } else {
+                    curePerson(p);
+                }
+            } else {
+                p.infectedTime++;
+            }
+        }
     });
+    persons.forEach(detectCollision)
     let end = Date.now();
     drawTime.add(Math.round(end-now));
-    document.getElementById("renderTime").innerText = Math.round(drawTime.average) + "ms";
+    document.getElementById("renderTime").innerText = Math.round(drawTime.average) + " ms";
 }
 
 /**
@@ -139,10 +247,11 @@ function setPersonCoords(person) {
 
 /**
  * @param {Person} person
+ * @param {number} i
  */
-function detectCollision(person) {
+function detectCollision(person, i) {
     detectWallCollision(person);
-    detectPersonsCollision(person);
+    detectPersonsCollision(person, i);
 }
 
 /**
@@ -172,32 +281,31 @@ function detectWallCollision(person) {
 
 /**
  * @param {Person} person
+ * @param {number} i
  */
-function detectPersonsCollision(person) {
+function detectPersonsCollision(person, i) {
     let middle = {
         x: person.x + radius,
         y: person.y + radius,
     };
 
-    persons.forEach((p) => {
-        if(p === person) {
-            return;
-        }
+    for (let i1 = i+1; i1 < persons.length; i1++){
+        const p = persons[i1];
 
         let dx = middle.x - (p.x + radius);
         let dy = middle.y - (p.y + radius);
         let d = dx * dx + dy * dy;
 
-        if(d <= radius * radius) {
+        if(d <= radius * radius * 2) {
             changeVelocity(p, person, "velocityX");
             changeVelocity(p, person, "velocityY");
 
-            if(p.infected || person.infected) {
-                infectPerson(p);
-                infectPerson(person);
+            if(p.infected ^ person.infected) {
+                incubatePerson(p);
+                incubatePerson(person);
             }
         }
-    })
+    }
 }
 
 /**
@@ -211,6 +319,13 @@ function changeVelocity(person1, person2, velocity) {
     person2[velocity] = tempVelocity;
 }
 
+function isEnd() {
+    if(stats.infected === 0 && stats.incubated === 0) {
+        running = false;
+        alert("Game Finished! All persons cured, dead or never infected.");
+    }
+}
+
 /**
  * @typedef {object} Person
  * @property {HTMLElement} node
@@ -219,4 +334,8 @@ function changeVelocity(person1, person2, velocity) {
  * @property {number} velocityX
  * @property {number} velocityY
  * @property {boolean} infected
+ * @property {number} incubationTime
+ * @property {number} infectedTime
+ * @property {boolean} willDie
+ * @property {boolean} isCured
  */

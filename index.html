@@ -6,16 +6,38 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <div id="renderTime" class="column-first">0</div>
+    <div class="row first-baseline">
+        <div id="renderTime" class="column-first">0 ms</div>
+        <div id="tickCounter" class="column-first">0 days</div>
+    </div>
     <div id="matchfield"></div>
     <div class="column-last">
-        <input id="population" placeholder="Population">
-        <input id="patient-zeros" placeholder="Patient Zeros">
-        <input id="incubation" placeholder="Incubation Time">
-        <input id="infected" placeholder="Infected Time">
-        <input id="lethality" placeholder="Lethality">
-        <button id="generate">Generate</button>
-        <button id="start-stop">Start/Stop</button>
+        <div id="form">
+            <div class="row">
+                <label for="population">Population:</label>
+                <input type="number" id="population" placeholder="Population" value="500">
+            </div>
+            <div class="row">
+                <label for="patient">Patient Zero's:</label>
+                <input type="number" id="patient" placeholder="Patient Zeros" value="1">
+            </div>
+            <div class="row">
+                <label for="incubation">Incubation Time:</label>
+                <input type="number" id="incubation" placeholder="Incubation Time" value="14">
+            </div>
+            <div class="row">
+                <label for="infected">Infected Time:</label>
+                <input type="number" id="infected" placeholder="Infected Time" value="14">
+            </div>
+            <div class="row">
+                <label for="Lethality">Lethality:</label>
+                <input type="number" id="lethality" placeholder="Lethality" value="3">
+            </div>
+            <div class="row space-evenly">
+                <button id="generate">Generate</button>
+                <button id="start-stop" class="start">Start/Stop</button>
+            </div>
+        </div>
     </div>
 </body>
 
