@@ -1,0 +1,49 @@
+body {
+    background: #666;
+    margin: 0;
+    display: grid;
+    grid-template-columns: [first] 1fr [middle] auto [last] 1fr;
+    height: 100vh;
+    place-items: center;
+}
+
+#matchfield {
+    border: 1px solid lightblue;
+    height: 800px;
+    width: 800px;
+    margin: 0;
+    grid-column: middle;
+    position: relative;
+}
+
+#renderTime {
+    padding: 10px;
+    color: #fff;
+}
+
+.person {
+    position: absolute;
+    background: lightgreen;
+    width: 10px;
+    height: 10px;
+}
+
+.round {
+    border-radius: 50%;
+}
+
+.ill {
+    background: lightcoral;
+}
+
+.column-last {
+    grid-column: last;
+    height: 800px;
+    width: 100%;
+}
+
+.column-first {
+    grid-column: first;
+    place-self: start;
+    width: 100%;
+}
