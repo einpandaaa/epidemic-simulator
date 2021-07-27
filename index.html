@@ -6,36 +6,71 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <div class="row first-baseline">
-        <div id="renderTime" class="column-first">0 ms</div>
-        <div id="tickCounter" class="column-first">0 days</div>
+    <div id="grid">
+        <div class="column-first">
+            <div class="row first-baseline">
+                <div id="renderTime">0 ms</div>
+                <div id="tickCounter">0 days</div>
+            </div>
+            <div class="stats">
+                <div class="row">
+                    <label>Healthy:</label>
+                    <p data-attr="healthy"></p>
+                </div>
+                <div class="row">
+                    <label>Incubated:</label>
+                    <p data-attr="incubated"></p>
+                </div>
+                <div class="row">
+                    <label>Infected:</label>
+                    <p data-attr="infected"></p>
+                </div>
+                <div class="row">
+                    <label>Cured:</label>
+                    <p data-attr="cured"></p>
+                </div>
+                <div class="row">
+                    <label>Dead:</label>
+                    <p data-attr="dead"></p>
+                </div>
+            </div>
+        </div>
+        <div id="matchfield"></div>
+        <div class="column-last">
+            <div id="form">
+                <div class="row center">
+                    <label for="population">Population:</label>
+                    <input type="number" id="population" placeholder="Population" value="500">
+                </div>
+                <div class="row center">
+                    <label for="patient">Patient Zero's:</label>
+                    <input type="number" id="patient" placeholder="Patient Zeros" value="1">
+                </div>
+                <div class="row center">
+                    <label for="incubation">Incubation Time:</label>
+                    <input type="number" id="incubation" placeholder="Incubation Time" value="14">
+                </div>
+                <div class="row center">
+                    <label for="infected">Infected Time:</label>
+                    <input type="number" id="infected" placeholder="Infected Time" value="14">
+                </div>
+                <div class="row center">
+                    <label for="Lethality">Lethality:</label>
+                    <input type="number" id="lethality" placeholder="Lethality" value="3">
+                </div>
+                <div class="row space-evenly">
+                    <button id="generate">Generate</button>
+                    <button id="start-stop" class="start">Start/Stop</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="matchfield"></div>
-    <div class="column-last">
-        <div id="form">
-            <div class="row">
-                <label for="population">Population:</label>
-                <input type="number" id="population" placeholder="Population" value="500">
-            </div>
-            <div class="row">
-                <label for="patient">Patient Zero's:</label>
-                <input type="number" id="patient" placeholder="Patient Zeros" value="1">
-            </div>
-            <div class="row">
-                <label for="incubation">Incubation Time:</label>
-                <input type="number" id="incubation" placeholder="Incubation Time" value="14">
-            </div>
-            <div class="row">
-                <label for="infected">Infected Time:</label>
-                <input type="number" id="infected" placeholder="Infected Time" value="14">
-            </div>
-            <div class="row">
-                <label for="Lethality">Lethality:</label>
-                <input type="number" id="lethality" placeholder="Lethality" value="3">
-            </div>
-            <div class="row space-evenly">
-                <button id="generate">Generate</button>
-                <button id="start-stop" class="start">Start/Stop</button>
+    <div id="overlay" class="dnone">
+        <div class="message-box">
+            <p></p>
+            <div class="buttons">
+                <button id="close1">Close</button>
+                <button id="close2">Close</button>
             </div>
         </div>
     </div>

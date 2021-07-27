@@ -1,8 +1,14 @@
+/**
+ * @author einpandaaa
+ */
 const matchfield = document.getElementById("matchfield");
 const maxWidth = matchfield.clientWidth - 10;
 const maxHeight = matchfield.clientHeight - 10;
 const radius = 5;
 const drawTime = new LinkedList();
+
+const generationError = "Initial generation of simulation needs to be done before starting the simulation.";
+const finishedMessage = "Game Finished! All persons cured, dead or never infected.";
 
 /** Default Values */
 let population = document.getElementById("population").value;
@@ -20,11 +26,14 @@ let stats = {};
 document.getElementById("start-stop").addEventListener('click', startStop);
 document.getElementById("generate").addEventListener('click', startGeneration);
 document.getElementById("form").addEventListener('input', detectUserInput);
+document.getElementById("close1").addEventListener('click', toggleOverlay);
+document.getElementById("close2").addEventListener('click', toggleOverlay);
 
 function tick() {
     if(running) {
         document.getElementById("tickCounter").innerText = ((++ticks)/30 | 0) + " days";
         movePersons();
+        displayStats();
         requestAnimationFrame(tick);
     }
 }
@@ -66,7 +75,22 @@ function startStop() {
             });
         }
     } else {
-        alert("Not Generated!");
+        toggleOverlay(generationError);
+    }
+}
+
+/**
+ * @param {string} message
+ */
+function toggleOverlay(message) {
+    if(document.getElementById("overlay").classList.contains("dnone")) {
+        document.getElementById("overlay").classList.remove("dnone");
+        document.getElementById("grid").classList.add("blur");
+        document.querySelector("#overlay .message-box p").innerText = message;
+    } else {
+        document.getElementById("overlay").classList.add("dnone");
+        document.getElementById("grid").classList.remove("blur");
+        document.querySelector("#overlay .message-box p").innerText = "";
     }
 }
 
@@ -79,8 +103,12 @@ function startGeneration() {
         patientZeros = document.getElementById("patient").value;
     }
 
+    stats.healthy = population;
     stats.incubated = 0;
     stats.infected = 0;
+    stats.cured = 0;
+    stats.dead = 0;
+    displayStats();
 
     if(persons.length) {
         matchfield.innerHTML = '';
@@ -134,6 +162,19 @@ function generateKoords() {
 }
 
 /**
+ * @param {Person} person
+ */
+function incubatePerson(person) {
+    if(!person.incubationTime && !person.isCured) {
+        person.incubationTime = 1;
+        person.node.classList.add("incubating");
+
+        stats.healthy--;
+        stats.incubated++;
+    }
+}
+
+/**
  * set ill status for person
  * @param {Person} person
  */
@@ -156,24 +197,13 @@ function infectPerson(person) {
 /**
  * @param {Person} person
  */
-function incubatePerson(person) {
-    if(!person.incubationTime && !person.isCured) {
-        person.incubationTime = 1;
-        person.node.classList.add("incubating");
-
-        stats.incubated++;
-    }
-}
-
-/**
- * @param {Person} person
- */
 function killPerson(person) {
     person.node.classList.remove("infected");
     person.node.classList.add("dead");
     persons.splice(persons.indexOf(person),1);
 
     stats.infected--;
+    stats.dead++;
     isEnd();
 }
 
@@ -188,6 +218,7 @@ function curePerson(person) {
     person.incubationTime = 0;
 
     stats.infected--;
+    stats.cured++;
     isEnd();
 }
 
@@ -322,8 +353,14 @@ function changeVelocity(person1, person2, velocity) {
 function isEnd() {
     if(stats.infected === 0 && stats.incubated === 0) {
         running = false;
-        alert("Game Finished! All persons cured, dead or never infected.");
+        toggleOverlay(finishedMessage);
     }
+}
+
+function displayStats() {
+    document.querySelectorAll(".stats .row p").forEach((e) => {
+        e.innerText = stats[e.getAttribute("data-attr")];
+    });
 }
 
 /**
