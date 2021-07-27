@@ -4,6 +4,8 @@
 
 **Note**:
 This Simulator was just programmed for fun and does not serve any deeper purpose.
+
+View it online: https://einpandaaa.github.io/epidemic-simulator/
 ****
 ## Installation Guide:
 If you just want to test the simulator locally you can just execute the index.html.
