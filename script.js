@@ -15,6 +15,7 @@ let ctx = canvas.getContext("2d");
 const generationError = "Initial generation of simulation needs to be done before starting the simulation.";
 const finishedMessage = "Game Finished! All persons cured, dead or never infected.";
 const endedMessage = "Your game is already finished. To keep going, generate a new round.";
+const inputError = "Your input for incubation or infected Time seems to be lower as 1 or not a number. This feature is planned for future development though."
 
 /** Default Values */
 let population = document.getElementById("population").value;
@@ -63,10 +64,20 @@ function detectUserInput(event) {
             patientZeros = event.target.value;
             break;
         case "incubation":
-            incubationTime = event.target.value * 30;
+            if(event.target.value <= 0) {
+                toggleOverlay(inputError);
+                document.getElementById("incubation").value = incubationTime / 30;
+            } else {
+                incubationTime = event.target.value * 30;
+            }
             break;
         case "infected":
-            infectedTime = event.target.value * 30;
+            if(event.target.value <= 0) {
+                toggleOverlay(inputError);
+                document.getElementById("infected").value = infectedTime / 30;
+            } else {
+                infectedTime = event.target.value * 30;
+            }
             break;
         case "lethality":
             lethality = event.target.value;
@@ -113,6 +124,13 @@ function toggleOverlay(message) {
 }
 
 function startGeneration() {
+    if(running) {
+        document.getElementById("start-stop").className = "start";
+        document.querySelectorAll("#form input").forEach((e) => {
+            e.removeAttribute("disabled");
+        });
+    }
+
     running = false;
     ticks = 0;
     document.getElementById("tickCounter").innerText = "0 days";
