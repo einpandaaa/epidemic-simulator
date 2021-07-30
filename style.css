@@ -2,6 +2,11 @@ body {
     margin: 0;
     font-size: 18px;
     font-family: Roboto, sans-serif;
+    color: #fff;
+}
+
+p {
+    margin: 0;
 }
 
 .dnone {
@@ -30,7 +35,7 @@ body {
 }
 
 #matchfield {
-    border: 1px solid lightblue;
+    border: 4px solid lightblue;
     height: 800px;
     width: 800px;
     margin: 0;
@@ -40,7 +45,6 @@ body {
 
 #renderTime, #tickCounter {
     padding: 10px;
-    color: #fff;
     white-space: nowrap;
 }
 
@@ -49,7 +53,6 @@ body {
 }
 
 label {
-    color: #fff;
     min-width: 150px;
     line-height: 30px;
 }
@@ -60,12 +63,21 @@ input {
 }
 
 button {
+    position: relative;
     font-size: 18px;
     border: none;
-    padding: 4px 15px;
+    padding: 4px 0 4px 0;
     transition: background 400ms;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
     cursor: pointer;
+    width: 120px
+}
+
+.button::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #generate {
@@ -76,8 +88,16 @@ button {
     background: lightgreen;
 }
 
+.start::after {
+    content: "Start";
+}
+
 .stop {
     background: lightcoral;
+}
+
+.stop::after {
+    content: "Stop";
 }
 
 .person {
@@ -86,6 +106,20 @@ button {
     width: 10px;
     height: 10px;
     z-index: 10;
+}
+
+#legend {
+    margin-top: 20px;
+}
+
+#legend .round {
+    width: 10px;
+    height: 10px;
+    margin: 5px 5px 0 0;
+}
+
+.healthy {
+    background: lightgreen;
 }
 
 .round {
@@ -154,7 +188,6 @@ button {
 
 .message-box p {
     text-align: center;
-    color: #fff;
 }
 
 #close1 {
@@ -177,7 +210,6 @@ button {
 
 .stats {
     margin: 25px 0 0 25px;
-    color: #fff;
 }
 
 .stats .row {
@@ -186,4 +218,29 @@ button {
 
 .stats .row p {
     margin: 0;
+}
+
+#statGraph {
+    width: 95%;
+    height: 500px;
+    background: #555;
+    margin: 20px 0 0 10px;
+    border: 4px solid grey;
+}
+
+#instructions {
+    margin: 0 30px;
+}
+
+#instructions div:first-child {
+    margin-top: 25px;
+}
+
+#instructions div:not(:last-child) {
+    margin-bottom: 25px;
+}
+
+#instructions label {
+    font-weight: 600;
+    font-size: 20px;
 }

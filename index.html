@@ -34,6 +34,33 @@
                     <p data-attr="dead"></p>
                 </div>
             </div>
+            <canvas id="statGraph" width="1000" height="1000">
+                Canvas not supported by browser.
+            </canvas>
+            <div id="legend">
+                <div class="row center space-evenly">
+                    <div class="row">
+                        <div class="round healthy"></div>
+                        Healthy
+                    </div>
+                    <div class="row">
+                        <div class="round incubating"></div>
+                        Incubated
+                    </div>
+                    <div class="row">
+                        <div class="round infected"></div>
+                        Infected
+                    </div>
+                    <div class="row">
+                        <div class="round cured"></div>
+                        Cured
+                    </div>
+                    <div class="row">
+                        <div class="round dead"></div>
+                        Dead
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="matchfield"></div>
         <div class="column-last">
@@ -60,7 +87,29 @@
                 </div>
                 <div class="row space-evenly">
                     <button id="generate">Generate</button>
-                    <button id="start-stop" class="start">Start/Stop</button>
+                    <button id="start-stop" class="start"></button>
+                </div>
+            </div>
+            <div id="instructions">
+                <div>
+                    <label>Population:</label>
+                    <p>How many entities the simulation will generate. Please note that a high population number will cause lag. Around 1000 entities will run kinda smoothly. If you got a beast of a pc you could pump this number up a bit.</p>
+                </div>
+                <div>
+                    <label>Patient Zero's:</label>
+                    <p>Number of incubated start entities.</p>
+                </div>
+                <div>
+                    <label>Incubation Time:</label>
+                    <p>Time of an entity spent in the incubated state in days.</p>
+                </div>
+                <div>
+                    <label>Infected Time:</label>
+                    <p>Time of an entity spent in the infected state in days.</p>
+                </div>
+                <div>
+                    <label>Lethality:</label>
+                    <p>Probability of an entity dying at the end of its infected state in percent.</p>
                 </div>
             </div>
         </div>

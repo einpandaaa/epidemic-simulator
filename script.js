@@ -7,8 +7,14 @@ const maxHeight = matchfield.clientHeight - 10;
 const radius = 5;
 const drawTime = new LinkedList();
 
+const canvas = document.getElementById("statGraph");
+const canvasWidth = canvas.width;
+const canvasHeight = canvas.height;
+let ctx = canvas.getContext("2d");
+
 const generationError = "Initial generation of simulation needs to be done before starting the simulation.";
 const finishedMessage = "Game Finished! All persons cured, dead or never infected.";
+const endedMessage = "Your game is already finished. To keep going, generate a new round.";
 
 /** Default Values */
 let population = document.getElementById("population").value;
@@ -19,9 +25,15 @@ let lethality = document.getElementById("lethality").value;
 
 let running = false;
 let ticks = 0;
+let end = false;
 let persons = [];
 
 let stats = {};
+
+/**
+ * @type {GraphData}
+ */
+let graphData = {};
 
 document.getElementById("start-stop").addEventListener('click', startStop);
 document.getElementById("generate").addEventListener('click', startGeneration);
@@ -34,6 +46,10 @@ function tick() {
         document.getElementById("tickCounter").innerText = ((++ticks)/30 | 0) + " days";
         movePersons();
         displayStats();
+        if(!(ticks % 30)) {
+            updateGraphData();
+            drawGraph();
+        }
         requestAnimationFrame(tick);
     }
 }
@@ -59,7 +75,7 @@ function detectUserInput(event) {
 }
 
 function startStop() {
-    if(persons.length) {
+    if(persons.length && !end) {
         running = !running;
 
         if(running) {
@@ -74,6 +90,8 @@ function startStop() {
                 e.removeAttribute("disabled");
             });
         }
+    } else if (end){
+        toggleOverlay(endedMessage);
     } else {
         toggleOverlay(generationError);
     }
@@ -110,6 +128,12 @@ function startGeneration() {
     stats.dead = 0;
     displayStats();
 
+    graphData.healthy = [population];
+    graphData.incubated = [patientZeros];
+    graphData.infected = [0];
+    graphData.cured = [0];
+    graphData.dead = [0];
+
     if(persons.length) {
         matchfield.innerHTML = '';
         persons = [];
@@ -125,6 +149,7 @@ function startGeneration() {
  * @param {number[]} coords
  */
 function generatePerson(coords) {
+    end = false;
     /**
      * @type {Person}
      */
@@ -136,9 +161,7 @@ function generatePerson(coords) {
     };
 
     person.node.className = "round person";
-
     setPersonCoords(person);
-
     calculateMoveParams(person);
 
     if(patientZeros > 0) {
@@ -353,7 +376,15 @@ function changeVelocity(person1, person2, velocity) {
 function isEnd() {
     if(stats.infected === 0 && stats.incubated === 0) {
         running = false;
+        end = true;
         toggleOverlay(finishedMessage);
+        updateGraphData();
+        drawGraph();
+
+        document.getElementById("start-stop").className = "start";
+        document.querySelectorAll("#form input").forEach((e) => {
+            e.removeAttribute("disabled");
+        });
     }
 }
 
@@ -361,6 +392,50 @@ function displayStats() {
     document.querySelectorAll(".stats .row p").forEach((e) => {
         e.innerText = stats[e.getAttribute("data-attr")];
     });
+}
+
+function drawGraph() {
+    let xSteps = canvasWidth / (ticks/30);
+    let ySteps = canvasHeight / population;
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    drawLine("healthy", "lightgreen", xSteps, ySteps);
+    drawLine("incubated", "lightcoral", xSteps, ySteps);
+    drawLine("infected", "red", xSteps, ySteps);
+    drawLine("cured", "lightskyblue", xSteps, ySteps);
+    drawLine("dead", "#333", xSteps, ySteps);
+}
+
+/**
+ *
+ * @param {string} state
+ * @param {string} color
+ * @param {number} xSteps
+ * @param {number} ySteps
+ */
+function drawLine(state, color, xSteps, ySteps) {
+    let posX = 0;
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 10;
+    ctx.moveTo(posX, canvasHeight - ySteps * graphData[state][0]);
+    graphData[state].forEach((e, i) => {
+        if(i === 0) {
+            return;
+        }
+        posX += xSteps;
+        ctx.lineTo(posX, canvasHeight - ySteps * e);
+    })
+    ctx.stroke();
+}
+
+function updateGraphData() {
+    graphData.healthy.push(stats.healthy);
+    graphData.incubated.push(stats.incubated);
+    graphData.infected.push(stats.infected);
+    graphData.cured.push(stats.cured);
+    graphData.dead.push(stats.dead);
 }
 
 /**
@@ -375,4 +450,13 @@ function displayStats() {
  * @property {number} infectedTime
  * @property {boolean} willDie
  * @property {boolean} isCured
+ */
+
+/**
+ * @typedef {object} GraphData
+ * @property {number[]} healthy
+ * @property {number[]} incubated
+ * @property {number[]} infected
+ * @property {number[]} cured
+ * @property {number[]} dead
  */
